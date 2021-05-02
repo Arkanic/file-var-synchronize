@@ -1,0 +1,34 @@
+{
+  "name": "file-var-synchronize",
+  "version": "1.0.0",
+  "description": "A tiny, no-dependency way to continually save the contents of a variable to a file during runtime",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arkanic/file-var-synchronize.git"
+  },
+  "keywords": [
+    "file",
+    "variable",
+    "synchronize",
+    "simple",
+    "db"
+  ],
+  "author": "Arkanic",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Arkanic/file-var-synchronize/issues"
+  },
+  "homepage": "https://github.com/Arkanic/file-var-synchronize#readme",
+  "devDependencies": {
+    "@types/node": "^15.0.1",
+    "typescript": "^4.2.4"
+  }
+}
