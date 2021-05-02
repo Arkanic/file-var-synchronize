@@ -7,8 +7,8 @@ export default class FVSync {
     private _operationsRunning;
     private onWorkingChange;
     constructor(file: string, encoding?: string);
-    connect(): Promise<NodeJS.ErrnoException | undefined>;
-    disconnect(): Promise<void>;
+    connect(callback: (err?: NodeJS.ErrnoException) => any): void;
+    disconnect(callback: () => any): void;
     private write;
     get connected(): boolean;
     set connected(value: boolean);

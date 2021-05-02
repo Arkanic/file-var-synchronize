@@ -1,6 +1,6 @@
 {
   "name": "file-var-synchronize",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A tiny, no-dependency way to continually save the contents of a variable to a file during runtime",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

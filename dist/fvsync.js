@@ -11,41 +11,35 @@ var FVSync = /** @class */ (function () {
         this._operationsRunning = 0; // internal, the amount of file i/o operations currently running
         this.onWorkingChange = function () { };
     }
-    FVSync.prototype.connect = function () {
+    FVSync.prototype.connect = function (callback) {
         var _this = this;
-        return new Promise(function (resolve) {
-            fs.readFile(_this.file, _this.encoding, function (err, data) {
-                if (err)
-                    return resolve(err);
-                _this._content = data; // skip getters/setters to prevent default action
-                _this._connected = true;
-                resolve(undefined);
-            });
+        fs.readFile(this.file, this.encoding, function (err, data) {
+            if (err)
+                return callback(err);
+            _this._content = data; // skip getters/setters to prevent default action
+            _this._connected = true;
+            callback();
         });
     };
-    FVSync.prototype.disconnect = function () {
+    FVSync.prototype.disconnect = function (callback) {
         var _this = this;
-        return new Promise(function (resolve) {
-            _this._connected = false;
-            _this.onWorkingChange = function () {
-                if (_this.operationsRunning == 0) {
-                    _this.onWorkingChange = function () { };
-                    resolve();
-                }
-            };
-        });
+        this._connected = false;
+        this.onWorkingChange = function () {
+            if (_this.operationsRunning == 0) {
+                _this.onWorkingChange = function () { };
+                callback();
+            }
+        };
     };
-    FVSync.prototype.write = function () {
+    FVSync.prototype.write = function (callback) {
         var _this = this;
-        return new Promise(function (resolve) {
-            _this.operationsRunning++;
-            fs.writeFile(_this.file, _this.content, _this.encoding, function (err) {
-                _this.operationsRunning--;
-                if (err)
-                    resolve(err);
-                else
-                    resolve(undefined);
-            });
+        this.operationsRunning++;
+        fs.writeFile(this.file, this.content, this.encoding, function (err) {
+            _this.operationsRunning--;
+            if (err)
+                callback(err);
+            else
+                callback();
         });
     };
     Object.defineProperty(FVSync.prototype, "connected", {
@@ -65,7 +59,10 @@ var FVSync = /** @class */ (function () {
         set: function (value) {
             this._content = value;
             if (this.connected)
-                this.write();
+                this.write(function (err) {
+                    if (err)
+                        throw err;
+                });
         },
         enumerable: false,
         configurable: true

@@ -22,41 +22,35 @@ export default class FVSync {
         this.onWorkingChange = () => {};
     }
 
-    connect():Promise<NodeJS.ErrnoException|undefined> {
-        return new Promise<NodeJS.ErrnoException|undefined>(resolve => {
-            fs.readFile(this.file, this.encoding, (err, data) => {
-                if(err) return resolve(err);
+    connect(callback:(err?:NodeJS.ErrnoException) => any):void {
+        fs.readFile(this.file, this.encoding, (err, data) => {
+            if(err) return callback(err);
 
-                this._content = data; // skip getters/setters to prevent default action
-                this._connected = true;
+            this._content = data; // skip getters/setters to prevent default action
+            this._connected = true;
 
-                resolve(undefined);
-            });
+            callback();
         });
     }
 
-    disconnect():Promise<void> {
-        return new Promise<void>(resolve => {
-            this._connected = false;
+    disconnect(callback:() => any):void {
+        this._connected = false;
 
-            this.onWorkingChange = ():void => {
-                if(this.operationsRunning == 0) {
-                    this.onWorkingChange = () => {};
-                    resolve();
-                }
+        this.onWorkingChange = ():void => {
+            if(this.operationsRunning == 0) {
+                this.onWorkingChange = () => {};
+                callback();
             }
-        });
+        }
     }
 
-    private write():Promise<NodeJS.ErrnoException|undefined> {
-        return new Promise<NodeJS.ErrnoException|undefined>(resolve => {
-            this.operationsRunning++;
-            fs.writeFile(this.file, this.content, this.encoding, (err) => {
-                this.operationsRunning--;
+    private write(callback:(err?:NodeJS.ErrnoException) => any):void {
+        this.operationsRunning++;
+        fs.writeFile(this.file, this.content, this.encoding, (err) => {
+            this.operationsRunning--;
                 
-                if(err) resolve(err);
-                else resolve(undefined);
-            });
+            if(err) callback(err);
+            else callback();
         });
     }
 
@@ -73,7 +67,9 @@ export default class FVSync {
     set content(value:string) {
         this._content = value;
         
-        if(this.connected) this.write();
+        if(this.connected) this.write((err) => {
+            if(err) throw err;
+        });
     }
 
     private get operationsRunning():number {
